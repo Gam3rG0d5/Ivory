@@ -2,8 +2,8 @@ const mineflayer = require('mineflayer')
 
 // Bot configuration
 const botConfig = {
-  host: 'BOOOOOM69.aternos.me', // Your Aternos server IP
-  port: 57404, // Your server port
+  host: 'mrgoldmc.aternos.me', // Your Aternos server IP
+  port: 40454, // Your server port
   username: 'chotiadkrak', // Bot's username
   password: 'uzair@1111', // Password for /login command
   version: false // Auto-detect server version (works with ViaBackwards)
