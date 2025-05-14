@@ -1,37 +1,39 @@
 const mineflayer = require('mineflayer')
 
-// Bot configuration
+// Bot configuration from environment variables
 const botConfig = {
-  host: 'mrgoldmc.aternos.me', // Your Aternos server IP
-  port: 40454, // Your server port
-  username: 'chotiadkrak', // Bot's username
-  password: 'uzair@1111', // Password for /login command
+  host: process.env.SERVER_HOST || 'BOOOOOM69.aternos.me', // Fallback if not set
+  port: parseInt(process.env.SERVER_PORT) || 57404, // Convert to number, fallback
+  username: process.env.BOT_USERNAME || 'chotiadkrak', // Fallback
   version: false // Auto-detect server version (works with ViaBackwards)
 }
 
 // Create the bot
 let bot = mineflayer.createBot(botConfig)
 
-// Handle errors and disconnections
+// Handle errors
 bot.on('error', (err) => {
   console.log('Bot error:', err)
+  if (err.code === 'ECONNRESET') {
+    console.log('Connection reset by server. Retrying in 5 seconds...')
+    setTimeout(() => {
+      bot = mineflayer.createBot(botConfig) // Retry after 5 seconds
+    }, 5000)
+  }
 })
 
+// Handle disconnections
 bot.on('end', () => {
-  console.log('Bot disconnected. Reconnecting in 2 seconds...')
+  console.log('Bot disconnected. Reconnecting in 5 seconds...')
   setTimeout(() => {
-    bot = mineflayer.createBot(botConfig) // Reconnect after 2 seconds
-  }, 2000)
+    bot = mineflayer.createBot(botConfig) // Reconnect after 5 seconds
+  }, 5000)
 })
 
-// Handle login plugin (e.g., AuthMe)
+// Start movement on spawn
 bot.on('spawn', () => {
-  console.log('Bot spawned, attempting to login...')
-  // Send /login command with the provided password
-  bot.chat(`/login ${botConfig.password}`)
-  
-  // Start movement and jumping after 3 seconds to ensure login is complete
-  setTimeout(startMovement, 3000)
+  console.log('Bot spawned, starting movement...')
+  startMovement()
 })
 
 // Movement and jumping logic
@@ -63,9 +65,9 @@ bot.on('kicked', (reason) => {
   console.log('Bot kicked:', reason)
 })
 
-// Log when the bot logs in successfully
+// Log when the bot spawns (for confirmation)
 bot.on('messagestr', (msg) => {
-  if (msg.includes('Successfully authenticated') || msg.includes('Logged in')) {
-    console.log('Bot successfully logged in!')
+  if (msg.includes('Welcome') || msg.includes('joined the game')) {
+    console.log('Bot successfully connected!')
   }
 })
